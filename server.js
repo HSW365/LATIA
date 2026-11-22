@@ -1,0 +1,31 @@
+import express from 'express';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import OpenAI from 'openai';
+import Stripe from 'stripe';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+const app=express();
+const __dirname=path.dirname(fileURLToPath(import.meta.url));
+const PORT=process.env.PORT||3000;
+app.use(helmet({contentSecurityPolicy:false}));
+app.use(cookieParser());
+app.use('/api/stripe/webhook',express.raw({type:'application/json'}));
+app.use(express.json({limit:'1mb'}));
+app.use(express.static(path.join(__dirname,'public')));
+const stripe=process.env.STRIPE_SECRET_KEY?new Stripe(process.env.STRIPE_SECRET_KEY):null;
+const sessions=new Map();
+const entitlements=new Map();
+const systemPrompt=`You are the Truth Be Told AI host, a compassionate, grounded guide discussing the life and teachings of Jesus, biblical texts, history, faith, life, relationships, family, society, science, and the future. You are an AI character inspired by Jesus' teachings, NOT Jesus, God, a prophet, or a source of revelation. Never claim divine authority, supernatural access, personal memories of biblical events, or infallibility. Separate: (1) what biblical texts say, (2) what historians commonly infer, (3) what Christian traditions believe, and (4) what is uncertain. For Jesus' life cover first-century Jewish context, Gospel birth/childhood accounts, baptism and ministry, parables and disciples, final days in Jerusalem, crucifixion under Pontius Pilate, resurrection belief and early Christian proclamation, historical legacy through 2026, and future biblical interpretations. State that exact birth date/year is uncertain. Distinguish Christian resurrection faith from what historical methods can independently establish. For end-times questions explain differing interpretations, never set dates or claim current events prove prophecy. Be warm, respectful, direct, nonjudgmental. Do not invent scripture quotations or references. Cite book/chapter/verse when confidently known. Answer the user's question directly.`;
+function userFrom(req){const token=req.cookies.ttb_session;return token?sessions.get(token):null;}
+app.get('/api/health',(_,res)=>res.json({ok:true,app:'Truth Be Told',billingConfigured:Boolean(stripe),aiConfigured:Boolean(process.env.OPENAI_API_KEY)}));
+app.post('/api/session', (req,res)=>{const email=String(req.body?.email||'').trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(email))return res.status(400).json({error:'Enter a valid email.'});const token=crypto.randomBytes(32).toString('hex');sessions.set(token,{email,createdAt:Date.now()});res.cookie('ttb_session',token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',maxAge:30*864e5});res.json({ok:true,email,subscribed:entitlements.get(email)==='active'});});
+app.delete('/api/session',(req,res)=>{const t=req.cookies.ttb_session;if(t)sessions.delete(t);res.clearCookie('ttb_session');res.json({ok:true});});
+app.post('/api/chat',async(req,res)=>{const user=userFrom(req);if(!user)return res.status(401).json({error:'Sign in to continue.'});if(!process.env.OPENAI_API_KEY)return res.status(503).json({error:'AI service is not configured yet. Add OPENAI_API_KEY in the service environment.'});const question=String(req.body?.message||'').trim();if(!question||question.length>5000)return res.status(400).json({error:'Enter a question up to 5,000 characters.'});try{const ai=new OpenAI({apiKey:process.env.OPENAI_API_KEY});const completion=await ai.chat.completions.create({model:process.env.OPENAI_MODEL||'gpt-4o-mini',messages:[{role:'system',content:systemPrompt},{role:'user',content:question}],temperature:.6,max_tokens:900});res.json({answer:completion.choices[0]?.message?.content||'I could not form an answer just now.'});}catch(e){console.error('chat error',e.message);res.status(502).json({error:'The host could not respond right now. Please try again.'});}});
+app.post('/api/billing/checkout',async(req,res)=>{const user=userFrom(req);if(!user)return res.status(401).json({error:'Sign in first.'});if(!stripe||!process.env.STRIPE_PRICE_ID)return res.status(503).json({error:'Subscription checkout is not configured yet.'});try{const s=await stripe.checkout.sessions.create({mode:'subscription',customer_email:user.email,line_items:[{price:process.env.STRIPE_PRICE_ID,quantity:1}],success_url:(process.env.APP_URL||'http://localhost:3000')+'/?billing=success',cancel_url:(process.env.APP_URL||'http://localhost:3000')+'/?billing=cancelled',allow_promotion_codes:true});res.json({url:s.url});}catch(e){console.error('checkout error',e.message);res.status(502).json({error:'Could not start checkout.'});}});
+app.post('/api/billing/portal',async(req,res)=>{const user=userFrom(req);if(!user)return res.status(401).json({error:'Sign in first.'});if(!stripe)return res.status(503).json({error:'Billing portal is not configured.'});try{const list=await stripe.customers.list({email:user.email,limit:1});if(!list.data[0])return res.status(404).json({error:'No billing customer found.'});const p=await stripe.billingPortal.sessions.create({customer:list.data[0].id,return_url:process.env.APP_URL||'http://localhost:3000'});res.json({url:p.url});}catch(e){res.status(502).json({error:'Could not open billing portal.'});}});
+app.post('/api/stripe/webhook',async(req,res)=>{if(!stripe||!process.env.STRIPE_WEBHOOK_SECRET)return res.status(503).send('Webhook not configured');let event;try{event=stripe.webhooks.constructEvent(req.body,req.headers['stripe-signature'],process.env.STRIPE_WEBHOOK_SECRET);}catch(e){return res.status(400).send('Invalid signature');}if(['customer.subscription.created','customer.subscription.updated','customer.subscription.deleted'].includes(event.type)){const sub=event.data.object;const customer=await stripe.customers.retrieve(sub.customer);if(customer.email)entitlements.set(customer.email,sub.status==='active'||sub.status==='trialing'?'active':'inactive');}res.json({received:true});});
+app.get('*',(req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
+app.listen(PORT,()=>console.log('Truth Be Told listening on '+PORT));
