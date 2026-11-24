@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 405" role="img" aria-label="Illustrated AI host: a warm, bearded man with dark skin and dark curly hair">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1dfae"/><stop offset=".6" stop-color="#d8e6c8"/><stop offset="1" stop-color="#eaa98c"/></linearGradient>
+<radialGradient id="skin" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#8a5a3c"/><stop offset="1" stop-color="#6b4129"/></radialGradient>
+<radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff3c4" stop-opacity=".95"/><stop offset="1" stop-color="#fff3c4" stop-opacity="0"/></radialGradient>
+<linearGradient id="robe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4eadb"/><stop offset="1" stop-color="#d9c9ae"/></linearGradient>
+</defs>
+<rect width="310" height="405" fill="url(#bg)"/>
+<circle cx="155" cy="150" r="125" fill="url(#glow)"/>
+<path d="M30 405c6-70 46-100 125-100s119 30 125 100z" fill="url(#robe)"/>
+<path d="M105 318c22 22 78 22 100 0l-8 87h-84z" fill="#c9b793" opacity=".55"/>
+<rect x="128" y="250" width="54" height="64" rx="22" fill="#6b4129"/>
+<path d="M76 168c-8-80 44-122 79-122s87 42 79 122c-4 36-10 60-22 84-18 40-40 52-57 52s-39-12-57-52c-12-24-18-48-22-84z" fill="url(#skin)"/>
+<path d="M70 150c-12-78 36-124 85-124s97 46 85 124c-8-30-16-52-30-66-14 14-34 22-55 22s-41-8-55-22c-14 14-22 36-30 66z" fill="#17110d"/>
+<g fill="#17110d"><circle cx="82" cy="92" r="16"/><circle cx="104" cy="66" r="18"/><circle cx="134" cy="52" r="19"/><circle cx="168" cy="50" r="19"/><circle cx="200" cy="62" r="18"/><circle cx="224" cy="88" r="16"/><circle cx="68" cy="128" r="13"/><circle cx="242" cy="128" r="13"/></g>
+<path d="M82 188c2 52 20 84 38 98 11 8 59 8 70 0 18-14 36-46 38-98-14 26-30 36-46 40-14 4-40 4-54 0-16-4-32-14-46-40z" fill="#17110d"/>
+<path d="M120 252c10 10 60 10 70 0-8 22-62 22-70 0z" fill="#2a1d15"/>
+<ellipse cx="124" cy="160" rx="13" ry="7.5" fill="#fff8ee"/><ellipse cx="186" cy="160" rx="13" ry="7.5" fill="#fff8ee"/>
+<circle cx="125" cy="160" r="6" fill="#2b1a10"/><circle cx="187" cy="160" r="6" fill="#2b1a10"/>
+<circle cx="127" cy="158" r="1.8" fill="#fff"/><circle cx="189" cy="158" r="1.8" fill="#fff"/>
+<path d="M106 143c10-9 26-10 36-4M168 139c10-6 26-5 36 4" stroke="#17110d" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M155 164c-3 14-8 26-8 32 3 5 13 5 16 0 0-6-5-18-8-32z" fill="#5c3822" opacity=".5"/>
+<path d="M134 228c14 8 28 8 42 0" stroke="#d99a86" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M136 231c12 6 26 6 38 0-6 8-32 8-38 0z" fill="#a8574a" opacity=".55"/>
+</svg>
