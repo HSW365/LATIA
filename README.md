@@ -15,12 +15,11 @@ HSW365 Media conversational web application.
 - `APP_URL` — canonical deployed URL.
 
 ## Important production work still required
-- Add the approved portrait file at `public/avatar.jpg`.
 - Configure verified email authentication (the included session endpoint is a scaffold, not production identity verification).
 - Add persistent PostgreSQL storage for users, sessions, conversation history, and subscription entitlements; current in-memory maps reset on restart and are not multi-instance safe.
 - Configure Stripe product/price at USD $8/month and webhook endpoint `/api/stripe/webhook`; live billing is intentionally not activated by this scaffold.
 - Configure OpenAI key in Render; never commit secrets.
-- Integrate iRUN voice synthesis and SadTalker talking-face rendering as a separate worker/service with secure job queue and model storage. This UI currently offers browser speech output and speech recognition as a fallback, not iRUN's generated voice or full real-time calling.
+- Live call screen: hold-to-talk mic (browser speech recognition), spoken answers via free neural TTS (`/api/speak`, `TTS_VOICE`/`TTS_RATE`/`TTS_PITCH` env), face generated with iRun's image engine and animated in-browser from the audio. SadTalker-quality lip-sync is not real-time on free CPU; it would need a GPU worker.
 - Add rate limiting, CSRF protections, verified login, privacy controls, retention/deletion, monitoring, and end-to-end tests before public launch.
 
 ## Host integrity
