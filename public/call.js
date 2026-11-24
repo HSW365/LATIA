@@ -64,7 +64,7 @@
     setState('speaking', 'Speaking…'); capEl.textContent = text;
     try {
       const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 20000);
-      const r = await fetch('/api/speak', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ text }), signal: ctl.signal });
+      const r = await fetch('/api/speak', { method: 'POST', headers: { 'Content-Type': 'application/json', ...window.TBT.ownerHeaders() }, credentials: 'same-origin', body: JSON.stringify({ text }), signal: ctl.signal });
       clearTimeout(to);
       if (!r.ok) throw new Error('voice');
       const blob = await r.blob(); const url = URL.createObjectURL(blob);
@@ -88,7 +88,7 @@
   async function ask(q) {
     setState('thinking', 'Thinking…'); capEl.textContent = '“' + q + '”';
     try {
-      const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ message: q, mode: 'call', history }) });
+      const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', ...window.TBT.ownerHeaders() }, credentials: 'same-origin', body: JSON.stringify({ message: q, mode: 'call', history }) });
       const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Request failed');
       history.push({ role: 'user', content: q }, { role: 'assistant', content: d.answer }); history = history.slice(-10);
       speak(d.answer);
