@@ -16,3 +16,4 @@
 #talkBtn.held{background:#e8896b;transform:scale(1.1);box-shadow:0 0 0 12px rgba(232,137,107,.3)}
 .call-hint{font-size:12px;color:#aebfae;letter-spacing:.06em}
 .endcall{position:absolute;right:7vw;top:20px;width:50px;height:50px;border-radius:50%;border:0;background:#c0392b;color:#fff;font-size:20px;cursor:pointer}
+\n.voice-reply{border:1px solid #c8d5c7;background:#f4f7f1;color:#315747;border-radius:20px;padding:9px 12px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap} .voice-reply[aria-pressed=true]{background:#d9e8bd;border-color:#256b56}@media(max-width:760px){.chat-controls{flex-wrap:wrap}.chat-controls span{min-width:45%}.voice-reply{font-size:9px;padding:8px 10px}}
